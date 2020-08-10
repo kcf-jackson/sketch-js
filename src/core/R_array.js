@@ -11,7 +11,9 @@ import {
     sizeDependencies
 } from "mathjs";
 
-const math = create({
+const {
+    typed, flatten, transpose, reshape, subset, index, prod, range, size
+} = create({
     typedDependencies,
     flattenDependencies,
     transposeDependencies,
@@ -21,15 +23,15 @@ const math = create({
     prodDependencies,
     rangeDependencies,
     sizeDependencies
-}, {matrix: 'Array'})
+}, { matrix: 'Array' })
 
 // Combine values into a vector
 function c() {
-    return math.flatten([...arguments]);
+    return flatten([...arguments]);
 }
 
 // Matrices
-const matrix2 = math.typed('matrix2', {
+const matrix2 = typed('matrix2', {
     'null | undefined | number | string | boolean | Array, number, number': function(x, nrow, ncol) {
         return matrix2(x, nrow, ncol, false);
     },
@@ -39,18 +41,18 @@ const matrix2 = math.typed('matrix2', {
     },
     'Array, number, number, boolean': function(x, nrow, ncol, byrow = false) {
         return byrow?
-            math.reshape(x, [nrow, ncol]):
-            math.transpose(math.reshape(x, [ncol, nrow]));
+            reshape(x, [nrow, ncol]):
+            transpose(reshape(x, [ncol, nrow]));
     }
 })
 
 // Array
-const array = math.typed('array', {
+const array = typed('array', {
     'number, Array': function(x, dims) {
-        let y = Array(math.prod(dims)).fill(x);
+        let y = Array(prod(dims)).fill(x);
         return array(y, dims);
     },
-    'Array, Array': (x, dims) => math.reshape(x, dims)
+    'Array, Array': (x, dims) => reshape(x, dims)
 })
 
 
@@ -60,54 +62,54 @@ only the `[` extractor, but not the `[[` extractor.
 The extractor takes any number of arguments, and each of them 
 can be a number or a (R-)vector. 
 */
-const arrayExtract = math.typed('extract', {
+const arrayExtract = typed('extract', {
     'Array, ...number | Array': function(x, indices) {
-        return math.subset(x, math.index(...indices));
+        return subset(x, index(...indices));
     }
 })
 
-const emptyIndex = math.typed('emptyIndex', {
+const emptyIndex = typed('emptyIndex', {
     'Array, number': function(x, index) {
-        return math.range(0, math.size(x)[index])
+        return range(0, size(x)[index])
     }
 })
 
 
 // Extract-Assignment
-const arrayExtractAssign = math.typed('extractAssign', {
+const arrayExtractAssign = typed('extractAssign', {
     'Array, boolean | number | string, ...number | Array': function(x, value, indices) {
-        let indexArray = math.index(...indices),
+        let indexArray = index(...indices),
             indexArrayDim = indexArray.size(),
-            indexArrayLen = math.prod(indexArrayDim),
+            indexArrayLen = prod(indexArrayDim),
             indexArrayIsScaler = indexArrayLen === 1;
         if (indexArrayIsScaler) {
             // Both target and source are scalars
-            return math.subset(x, math.index(...indices), value);
+            return subset(x, index(...indices), value);
         } else {
             // Construct Array if target is Array but source is scalar 
             let values = Array(indexArrayLen).fill(value),
-                valueArray = math.reshape(values, indexArrayDim);
-            return math.subset(x, indexArray, valueArray);
+                valueArray = reshape(values, indexArrayDim);
+            return subset(x, indexArray, valueArray);
         }
     },
     'Array, Array, ...number | Array': function(x, value, indices) {
-        return math.subset(x, math.index(...indices), value);
+        return subset(x, index(...indices), value);
     }
 })
 
 
-const dim = math.typed('dim', {
+const dim = typed('dim', {
     'null | undefined | number | string | boolean | Object': x => null,
-    'Array': x => math.size(x)
+    'Array': x => size(x)
 })
 
 
-export default {
-    c: c,
-    matrix2: matrix2,   // name clash with math.js
-    array: array,
-    extract: arrayExtract,
-    emptyIndex: emptyIndex,
-    extractAssign: arrayExtractAssign,
-    dim: dim
+export {
+    c,
+    matrix2,   // name clash with math.js
+    array,
+    arrayExtract as extract,
+    emptyIndex,
+    arrayExtractAssign as extractAssign,
+    dim
 }
