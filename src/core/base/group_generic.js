@@ -68,7 +68,18 @@ import {
     conjDependencies
 } from "mathjs";
 
-const math = create(
+const { 
+    typed, add, subtract, dotMultiply, dotPow, mod, dotDivide,
+    equal, larger, smaller, unequal, smallerEq, largerEq,
+    and, or, not, xor, 
+    pi, abs, sign, sqrt, floor, ceil, fix, round, 
+    exp, expm1, log, log10, log2, log1p, 
+    cos, sin, tan, acos, asin, atan, atan2, 
+    cosh, sinh, tanh, acosh, asinh, atanh, 
+    gamma, 
+    max, min, prod, sum, 
+    complex, re, im, arg, conj
+} = create(
     { 
         typedDependencies,
         addDependencies, 
@@ -143,7 +154,7 @@ Arithmetic functions
 ---------------------------------------------------------*/
 
 function intDivide(x, y) {
-    return math.floor(math.dotDivide(x, y));
+    return floor(dotDivide(x, y));
 }
 
 
@@ -155,29 +166,29 @@ Math functions
  
 const cumf = f => (x,y) => [f(x,y), f(x,y)]
 
-const cummax = math.typed('cummax', {
+const cummax = typed('cummax', {
     'number': x => x,
-    'Array': x => mapAccum(cumf(math.max), x[0], x)[1]
+    'Array': x => mapAccum(cumf(max), x[0], x)[1]
 })
 
-const cummin = math.typed('cummin', {
+const cummin = typed('cummin', {
     'number': x => x,
-    'Array': x => mapAccum(cumf(math.min), x[0], x)[1]
+    'Array': x => mapAccum(cumf(min), x[0], x)[1]
 })
 
-const cumprod = math.typed('cumprod', {
+const cumprod = typed('cumprod', {
     'number': x => x,
-    'Array': x => mapAccum(cumf(math.multiply), 1, x)[1]
+    'Array': x => mapAccum(cumf(dotMultiply), 1, x)[1]
 })
 
-const cumsum = math.typed('cumsum', {
+const cumsum = typed('cumsum', {
     'number': x => x,
-    'Array': x => mapAccum(cumf(math.add), 0, x)[1]
+    'Array': x => mapAccum(cumf(add), 0, x)[1]
 })
 
 const signif0 = (x, n) => parseFloat(x.toPrecision(n));
 
-const signif = math.typed('signif', {
+const signif = typed('signif', {
     'number, number': signif0,
     'number, Array': (x, ns) => ns.map(n => signif0(x, n)),
     'Array, number': (xs, n) => xs.map(x => signif0(x, n)),
@@ -198,15 +209,15 @@ Trigonometry functions
 ---------------------------------------------------------*/
 
 function cospi(x) { 
-    return math.cos(math.multiply(x, math.pi)); 
+    return cos(dotMultiply(x, pi)); 
 }
 
 function sinpi(x) { 
-    return math.sin(math.multiply(x, math.pi)); 
+    return sin(dotMultiply(x, pi)); 
 }
 
 function tanpi(x) { 
-    return math.tan(math.multiply(x, math.pi)); 
+    return tan(dotMultiply(x, pi)); 
 }
 
 
@@ -223,7 +234,7 @@ Special functions
  * @return A number or an Array of numbers.
  * @exports
  */
-const digamma = math.typed('digamma', {
+const digamma = typed('digamma', {
     'null | undefined | string | Object': function(x) { 
         throw new Error("non-numeric argument to mathematical function");
     },
@@ -269,7 +280,7 @@ function digamma0(x) {
  * @return A number or an Array of numbers.
  * @exports
  */
-const trigamma = math.typed('trigamma', {
+const trigamma = typed('trigamma', {
     'null | undefined | string | Object': function(x) { 
         throw new Error("non-numeric argument to mathematical function");
     },
@@ -310,7 +321,7 @@ function trigamma0(x) {
 
 
 function lgamma(x) { 
-    return math.log(math.gamma(x)); 
+    return log(gamma(x)); 
 }
 
 
@@ -330,7 +341,7 @@ Summary functions
  * @exports
  */
 const range = function(x) { 
-    return [math.min(x), math.max(x)]; 
+    return [min(x), max(x)]; 
 }
 
 
@@ -341,7 +352,7 @@ const range = function(x) {
  * @example all([true, true, false])  # false
  * @exports
  */
-const all2 = math.typed('all', {
+const all2 = typed('all', {
     '...boolean': xs => all(identity)([...xs]),  // follow R convention, but not recommended
     'Array': xs => all(identity)(flatten(xs))
 })
@@ -354,7 +365,7 @@ const all2 = math.typed('all', {
  * @example any([true, true, false])  # true
  * @exports
  */
-const any2 = math.typed('any', {
+const any2 = typed('any', {
     '...boolean': xs => any(identity)([...xs]),  // follow R convention, but not recommended
     'Array': xs => any(identity)(flatten(xs))
 })
@@ -366,30 +377,26 @@ const any2 = math.typed('any', {
 Export
 ---------------------------------------------------------*/
 
-export default {    
+export {    
     // Arith: "+", "-", "*", "^", "%%", "%/%", "/"
-    add:       math.add,
-    subtract:  math.subtract,
-    multiply:  math.dotMultiply,
-    pow:       math.dotPow,
-    mod:       math.mod,
-    intDivide: intDivide,
-    divide:    math.dotDivide,
+    add, subtract,
+    dotMultiply as multiply,
+    dotPow as pow,
+    mod,
+    intDivide,
+    dotDivide as divide,
     
     // Compare: "==", ">", "<", "!=", "<=", ">="
-    EQ:  math.equal,
-    GT:  math.larger,
-    LT:  math.smaller,
-    NEQ: math.unequal,
-    LEQ: math.smallerEq,
-    GEQ: math.largerEq,
+    equal as EQ,
+    larger as GT,
+    smaller as LT,
+    unequal as NEQ,
+    smallerEq as LEQ,
+    largerEq as GEQ,
 
-    // Logic: "&", "|"
-    and: math.and,   // `&` 
-    or : math.or,    // `|`
-    not: math.not,   // `!`
-    xor: math.xor,   // extra
-
+    // Logic: "&", "|", "!", extra
+    and, or, not, xor,
+    
     /*
     Math:   "abs", "sign", "sqrt", "ceiling", "floor", "trunc",
             "cummax", "cummin", "cumprod", "cumsum", 
@@ -399,66 +406,23 @@ export default {
             "gamma", "lgamma", "digamma", "trigamma"
     Math2:  "round", "signif"
     */
-    pi:        math.pi,
+    pi, abs, sign, sqrt, floor, ceil as ceiling, fix as trunc, round, signif,
+    cummax, cummin, cumprod, cumsum,    
+    exp, expm1, log, log10, log2, log1p,
+    cos, sin, tan, cospi, sinpi, tanpi, acos, asin, atan, atan2, cosh, sinh, tanh, acosh, asinh, atanh,
+    gamma, lgamma, digamma, trigamma,
     
-    abs:       math.abs,
-    sign:      math.sign,
-    sqrt:      math.sqrt,
-    floor:     math.floor,
-    ceiling:   math.ceil,
-    trunc:     math.fix,
-
-    round:     math.round,
-    signif:    signif,
-    
-    cummax:    cummax,
-    cummin:    cummin,
-    cumprod:   cumprod,
-    cumsum:    cumsum,
-
-    exp:       math.exp,
-    expm1:     math.expm1,
-    log:       math.log,
-    log10:     math.log10,
-    log2:      math.log2,
-    log1p:     math.log1p,
-    
-    cos:       math.cos,
-    sin:       math.sin,
-    tan:       math.tan,
-    cospi:     cospi,
-    sinpi:     sinpi,
-    tanpi:     tanpi,
-    acos:      math.acos,
-    asin:      math.asin,
-    atan:      math.atan,
-    atan2:     math.atan2,
-    cosh:      math.cosh,
-    sinh:      math.sinh,
-    tanh:      math.tanh,
-    acosh:     math.acosh,
-    asinh:     math.asinh,
-    atanh:     math.atanh,
-
-    gamma:     math.gamma,
-    lgamma:    lgamma,
-    digamma:   digamma,
-    trigamma:  trigamma,
-
     // Summary: "max", "min", "range", "prod", "sum", "any", "all"
-    max:       math.max,
-    min:       math.min,
-    range2:    range,       // name clash with math.js
-    prod:      math.prod,
-    sum:       math.sum,
-    any:       any2,        // name clash with Ramda.js
-    all:       all2,        // name clash with Ramda.js
-
+    max, min, 
+    range as range2,           // name clash with math.js
+    prod, sum, 
+    any2 as any, all2 as all,  // name clash with Ramda.js
+    
     // Complex: "Arg", "Conj", "Im", "Mod", "Re"
-    complex:   math.complex,
-    Re:        math.re,
-    Im:        math.im,
-    Mod:       math.abs,
-    Arg:       math.arg,
-    Conj:      math.conj
+    complex, 
+    re as Re, 
+    im as Im, 
+    abs as Mod, 
+    arg as Arg, 
+    conj as Conj
 };

@@ -10,7 +10,11 @@ import {
     setMultiplicityDependencies
 } from "mathjs";
 
-const math = create(
+const { 
+    typed, 
+    setDistinct, setUnion, setIntersect, setDifference, setSymDifference,
+    setSize, setIsSubset, setMultiplicity
+} = create(
     { typedDependencies, setDistinctDependencies,
         setUnionDependencies, setIntersectDependencies,
         setDifferenceDependencies, setSymDifferenceDependencies,
@@ -28,7 +32,7 @@ const math = create(
  * @exports
  */
 const union = function(x, y) {
-    return math.setUnion(math.setDistinct(x), math.setDistinct(y))
+    return setUnion(setDistinct(x), setDistinct(y))
 }
 
 
@@ -40,7 +44,7 @@ const union = function(x, y) {
  * @exports
  */
 const intersect = function(x, y) {
-    return math.setIntersect(math.setDistinct(x), math.setDistinct(y))
+    return setIntersect(setDistinct(x), setDistinct(y))
 }
 
 
@@ -52,7 +56,7 @@ const intersect = function(x, y) {
  * @exports
  */
 const setdiff = function(x, y) {
-    return math.setDifference(math.setDistinct(x), math.setDistinct(y))
+    return setDifference(setDistinct(x), setDistinct(y))
 }
 
 
@@ -64,8 +68,8 @@ const setdiff = function(x, y) {
  * @exports
  */
 const setequal = function(x, y) {
-    return math.setSize(math.setSymDifference(
-        math.setDistinct(x), math.setDistinct(y)
+    return setSize(setSymDifference(
+        setDistinct(x), setDistinct(y)
     )) === 0;
 }
 
@@ -77,12 +81,12 @@ const setequal = function(x, y) {
  * @return An array of elements.
  * @exports
  */
-const is_element = math.typed('is_element', {
+const is_element = typed('is_element', {
     'number, Array': function(x, y) {
-        return math.setIsSubset([x], y);
+        return setIsSubset([x], y);
     }, 
     'Array, Array' : function(x, y) {
-        return x.map(x => math.setIsSubset([x], y));
+        return x.map(x => setIsSubset([x], y));
     }
 })
 
@@ -95,29 +99,28 @@ const is_element = math.typed('is_element', {
  * @exports
  */
 const setsymdiff = function(x, y) {
-    return math.setSymDifference(math.setDistinct(x), math.setDistinct(y))
+    return setSymDifference(setDistinct(x), setDistinct(y))
 }
 
 
 // table = function(xs) {
-//     let set = math.setDistinct(xs)
+//     let set = setDistinct(xs)
 //     return {
 //         element: set, 
-//         count: set.map(el => math.setMultiplicity(el, xs))
+//         count: set.map(el => setMultiplicity(el, xs))
 //     };
 // }
 
 
-export default {
-    unique: math.setDistinct,
-    union: union,
-    intersect: intersect,
-    setdiff: setdiff,
-    setequal: setequal,
-    is_element: is_element,
-    // table: table
-    // extra
-    is_subset: math.setIsSubset,
-    setsymdiff: setsymdiff,
-    count: math.setMultiplicity
-};
+export {
+    setDistinct as unique, 
+    union, 
+    intersect, 
+    setdiff, 
+    setequal, 
+    is_element, 
+    // table
+    setIsSubset as is_subset, 
+    setsymdiff, 
+    setMultiplicity as count // extra
+}

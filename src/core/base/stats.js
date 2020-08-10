@@ -9,22 +9,27 @@ import {
     varianceDependencies, quantileSeqDependencies
 } from "mathjs";
 
-const math = create({
+const {min, max, mean, median, std, variance, quantileSeq} = create({
     typedDependencies, 
     minDependencies, maxDependencies,
     meanDependencies, medianDependencies, stdDependencies, 
     varianceDependencies, quantileSeqDependencies
 }, {matrix: 'Array'})
 
+
 const uniroot = function(f, interval, tol = 1e-8, maxiter = 1e3, extendInt = "no", trace = false) {
-    let lower = math.min(interval) 
-    ,   upper = math.max(interval)
+    let lower = min(interval) 
+    ,   upper = max(interval)
     ,   f_lower = f(lower)
     ,   f_upper = f(upper)
     
     let goodEnough = x => Math.abs(x) < tol
-    if (goodEnough(f_lower)) return {root: lower, f_root: f_lower, status: "success", iter: 0};
-    if (goodEnough(f_upper)) return {root: upper, f_root: f_upper, status: "success", iter: 0};
+    if (goodEnough(f_lower)) return {
+        root: lower, f_root: f_lower, status: "success", iter: 0, prec: undefined
+    };
+    if (goodEnough(f_upper)) return {
+        root: upper, f_root: f_upper, status: "success", iter: 0, prec: undefined
+    };
     
     let retry = 0;
     while (Math.sign(f_lower) * Math.sign(f_upper) > 0) {
@@ -62,7 +67,10 @@ const uniroot = function(f, interval, tol = 1e-8, maxiter = 1e3, extendInt = "no
     while (!goodEnough(f_midpt)) {
         if (iter > maxiter) {
             console.log("Maximum iteration is reached.")
-            return {root: midpt, f_root: f_midpt, status: "failed", iter: maxiter}
+            return {
+                root: midpt, f_root: f_midpt, status: "failed", iter: maxiter, 
+                prec: (upper - lower) / 2.0
+            }
         }
 
         if (Math.sign(f_midpt) * Math.sign(f_upper) > 0) {
@@ -76,7 +84,10 @@ const uniroot = function(f, interval, tol = 1e-8, maxiter = 1e3, extendInt = "no
         f_midpt = f(midpt);
         iter++;
     }
-    return {root: midpt, f_root: f_midpt, status: "success", iter: iter}
+    return {
+        root: midpt, f_root: f_midpt, status: "success", iter: iter,
+        prec: (upper - lower) / 2.0
+    }
 }
 
 const discrete_inverse = function(p, pmf, init) {
@@ -88,12 +99,8 @@ const discrete_inverse = function(p, pmf, init) {
     return ind;
 } 
 
-export default {
-    mean:     math.mean,
-    median:   math.median,
-    sd:       math.std,
-    "var":    math.variance,
-    quantile: math.quantileSeq,
-    uniroot: uniroot,
-    discrete_inverse: discrete_inverse
+
+export {
+    mean, median, std as sd, variance as var, quantileSeq as quantile, 
+    uniroot, discrete_inverse 
 }

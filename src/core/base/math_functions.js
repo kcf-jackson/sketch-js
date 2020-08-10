@@ -14,9 +14,12 @@ import {
     combinationsDependencies, factorialDependencies
 } from "mathjs";
 import { broadcast } from "./distributions/dist";
-import { mapAccumRight } from "ramda";
 
-const math = create(
+const {
+    typed, cot, csc, sec, acot, acsc, asec, 
+    coth, csch, sech, acoth, acsch, asech,
+    erf, log, gamma, combinations, factorial
+} = create(
     { typedDependencies, 
         cotDependencies, acotDependencies, cothDependencies, acothDependencies,
         cscDependencies, acscDependencies, cschDependencies, acschDependencies,
@@ -27,7 +30,7 @@ const math = create(
 )
 
 
-const ingamma = math.typed('ingamma', {
+const ingamma = typed('ingamma', {
     'null | undefined | boolean | string | Object, any': function(a, x) { 
         throw new Error("non-numeric argument to mathematical function");
     },
@@ -59,7 +62,7 @@ function ingamma0(A, X) {
     let GIN, GIM, GIP, GA, S, R, K, T0;
     if (X == 0.0) {
         GIN = 0.0;
-        GA = math.gamma(A);
+        GA = gamma(A);
         GIM = GA;
         GIP = 0.0;
     } else if (X <= 1 + A) {
@@ -73,7 +76,7 @@ function ingamma0(A, X) {
             }
         }
         GIN = Math.exp(XAM) * S
-        GA = math.gamma(A)
+        GA = gamma(A)
         GIP = GIN / GA
         GIM = GA - GIN
     } else if (X > 1 + A) {
@@ -82,7 +85,7 @@ function ingamma0(A, X) {
             T0 = (K - A) / (1.0 + K / (X + T0))
         }
         GIM =  Math.exp(XAM) / (X + T0)
-        GA = math.gamma(A)
+        GA = gamma(A)
         GIN = GA - GIM
         GIP = 1.0 - GIM / GA
     }
@@ -92,9 +95,9 @@ function ingamma0(A, X) {
 }
 
 
-const choose = math.typed('choose', {
+const choose = typed('choose', {
     'number, number': function(n, k) { 
-        return math.combinations(n, k);
+        return combinations(n, k);
     },
     'number, Array': function(n, k) {
         return k.map(el => choose(n, el));
@@ -111,32 +114,13 @@ const choose = math.typed('choose', {
 })
 
 function lchoose(n, k) {
-    return math.log(choose(n, k));
+    return log(choose(n, k));
 }
 
 
-export default {
-    cot: math.cot,
-    csc: math.csc,
-    sec: math.sec,
-    
-    acot: math.acot,
-    acsc: math.acsc,
-    asec: math.asec,
-    
-    coth: math.coth,
-    csch: math.csch,
-    sech: math.sech,
-    
-    acoth: math.acoth,
-    acsch: math.acsch,
-    asech: math.asech,
-    
-    erf: math.erf,
-    factorial: math.factorial,
-    choose: choose,
-    lchoose: lchoose,
-
-    ingamma: ingamma,
-    ingamma0: ingamma0
-};
+export {
+    cot, csc, sec, acot, acsc, asec, 
+    coth, csch, sech, acoth, acsch, asech,
+    erf, factorial, choose, lchoose,
+    ingamma, ingamma0
+}
