@@ -63,18 +63,20 @@ test("Testing uniroot", () => {
     //     root: 2.000000001862645,
     //     f_root: 7.450580596923828e-9,
     //     status: 'success',
-    //     iter: 30 
+    //     iter: 30,
+    //     prec: 9.313225746154785e-9
     // };
     expect(result.root).toBeCloseTo(2, 8);
     expect(result.f_root).toBeCloseTo(0, 7);
     expect(result.status).toBe("success");
+    expect(result.prec).toBeLessThan(1e-8);
 
     result = R.uniroot(f, [2,10]);
-    expected = { root: 2, f_root: 0, status: 'success', iter: 0 };
+    expected = { root: 2, f_root: 0, status: 'success', iter: 0, prec: undefined };
     expect(result).toStrictEqual(expected);
 
     result = R.uniroot(f, [0,2]);
-    expected = { root: 2, f_root: 0, status: 'success', iter: 0 };
+    expected = { root: 2, f_root: 0, status: 'success', iter: 0, prec: undefined };
     expect(result).toStrictEqual(expected);
 })
 

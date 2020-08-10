@@ -1,5 +1,4 @@
-// const R = require("../dist/R-node.js");
-const R = require(__dirname + "/../../bin/modules/R_array.js").default;
+const R = require("JEST_CONFIG_NAME_MAPPER/node-R_array.js");
 
 /*===================================================== 
   Test functions for R vector and R matrix
