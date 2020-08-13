@@ -210,53 +210,122 @@ test("Testing dataframe: print", () => {
   expect(result).toStrictEqual(expected);
 })
 
-// test("Testing dataframe: mutate", () => {
-// })
+test("Testing dataframe: mutate", () => {
+  let df0, result, expected;
+  df0 = R.data_frame({ c1: [1, 4, 2], c2: [6, 2, 10], c3: [4, 4, 4] });
 
-// test("Testing dataframe: select", () => {
-//     let df0, result, expected;
-//     df0 = new DataFrame([
-//         {c1: 1, c2: 6, c3:4}, // <------- A row
-//         {c1: 4, c2: 2, c3:4},
-//         {c1: 2, c2: 10, c3:4}
-//     ], ['c1', 'c2', 'c3']);
+  result = R.mutate(df0, 'new_col', row => row.get('c1') * 2);
+  expected = R.data_frame({
+    c1: [1, 4, 2], c2: [6, 2, 10], c3: [4, 4, 4], 
+    new_col: [2, 8, 4]
+  });
+  expect(result).toStrictEqual(expected);
+})
 
-//     result = R.select(df0, 'c1');
-//     expected = df0.select('c1');
-//     expect(result).toStrictEqual(expected);
+test("Testing dataframe: select", () => {
+    let df0, result, expected;
+    df0 = R.data_frame({
+      c1: [1, 4, 2],
+      c2: [6, 2, 10],
+      c3: [4, 4, 4]
+    });
 
-//     result = R.select(df0, 'c1', 'c3');
-//     expected = df0.select('c1', 'c3');
-//     expect(result).toStrictEqual(expected);
-// })
+    result = R.select(df0, 'c1');
+    expected = df0.select('c1');
+    expect(result).toStrictEqual(expected);
 
-// test("Testing dataframe: filter", () => {
-// })
+    result = R.select(df0, 'c1', 'c3');
+    expected = df0.select('c1', 'c3');
+    expect(result).toStrictEqual(expected);
+})
 
-// test("Testing dataframe: summarise", () => {
-// })
-
-// test("Testing dataframe: arrange", () => {
-//     let df0, result, expected;
-//     df0 = new DataFrame([
-//         {c1: 1, c2: 6}, // <------- A row
-//         {c1: 4, c2: 2},
-//         {c1: 2, c2: 10}
-//     ], ['c1', 'c2']);
+test("Testing dataframe: filter", () => {
+    let df0, result, expected;
+    df0 = R.data_frame({
+      c1: [1, 4, 2],
+      c2: [6, 2, 10],
+      c3: [4, 4, 4]
+    });
     
-//     result = R.arrange(df0, 'c1');
-//     expected = df0.sortBy('c1');
-//     expect(result).toStrictEqual(expected);
+    result = R.filter(df0, row => row.get('c1') >= 2);
+    expected = df0.filter(row => row.get('c1') >= 2);
+    expect(result).toStrictEqual(expected);
+})
 
-//     result = R.arrange(df0, 'c1', true);
-//     expected = df0.sortBy('c1', true);
-//     expect(result).toStrictEqual(expected);
 
-//     result = R.arrange(df0, ['c1', 'c2']);
-//     expected = df0.sortBy(['c1', 'c2']);
-//     expect(result).toStrictEqual(expected);
+test("Testing dataframe: count", () => {
+    let df0, result, expected;
+    df0 = R.data_frame({
+      column1: [3, 6, 8, 10],
+      column2: [3, 4, 5, 6],
+      column3: ['a', 'a', 'b', 'b'],
+      column4: ['c', 'c', 'd', 'b']
+    }, ['column1', 'column2', 'column3', 'column4']);
 
-//     result = R.arrange(df0, ['c1', 'c2'], true);
-//     expected = df0.sortBy(['c1', 'c2'], true);
-//     expect(result).toStrictEqual(expected);
-// })
+    result = R.count(df0, 'column3');
+    expected = R.data_frame({ column3: ['a', 'b'], n: [2, 2] });
+    expect(result).toStrictEqual(expected);
+
+    result = R.count(df0, ['column3', 'column4']);
+    expected = R.data_frame({ 
+      column3: ['a', 'b', 'b'], 
+      column4: ['c', 'd', 'b'],
+      n: [2, 1, 1] 
+    });
+    expect(result).toStrictEqual(expected);
+})
+
+
+test("Testing dataframe: summarise", () => {
+    let df0, result, expected;
+    df0 = R.data_frame({
+      column1: [3, 6, 8, 10],
+      column2: [3, 4, 5, 6],
+      column3: ['a', 'a', 'b', 'b'],
+      column4: ['c', 'c', 'd', 'b']
+    }, ['column1', 'column2', 'column3', 'column4']);
+
+    result = R.summarise(
+      R.group_by(df0, 'column3'),
+      'n', group => group.count(),
+    );
+    expected = R.data_frame({ column3: ['a', 'b'], n: [2, 2] });
+    expect(result).toStrictEqual(expected);
+
+    result = R.summarise(
+      R.group_by(df0, ['column3', 'column4']),
+      'n', group => group.stat.mean('column1'),
+    );
+    expected = R.data_frame({ 
+      column3: ['a', 'b', 'b'], 
+      column4: ['c', 'd', 'b'],
+      n: [4.5, 8, 10] 
+    });
+    expect(result).toStrictEqual(expected);
+})
+
+
+test("Testing dataframe: arrange", () => {
+    let df0, result, expected;
+    df0 = R.data_frame({
+      c1: [1, 4, 2],
+      c2: [6, 2, 10],
+      c3: [4, 4, 4]
+    });
+    
+    result = R.arrange(df0, 'c1');
+    expected = df0.sortBy('c1');
+    expect(result).toStrictEqual(expected);
+
+    result = R.arrange(df0, 'c1', true);
+    expected = df0.sortBy('c1', true);
+    expect(result).toStrictEqual(expected);
+
+    result = R.arrange(df0, ['c1', 'c2']);
+    expected = df0.sortBy(['c1', 'c2']);
+    expect(result).toStrictEqual(expected);
+
+    result = R.arrange(df0, ['c1', 'c2'], true);
+    expected = df0.sortBy(['c1', 'c2'], true);
+    expect(result).toStrictEqual(expected);
+})

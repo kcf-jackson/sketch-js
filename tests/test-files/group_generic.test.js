@@ -135,6 +135,17 @@ test("Testing Arithmetic operators", () => {
 })
 
 
+test("Testing Matrix Multiplicaton", () => {
+    let input_1, input_2, result, expected;
+    // Array-array
+    input_1 = [[1,2],[3,4]];
+    input_2 = [[1],[2]];
+
+    result = R.matMultiply(input_1, input_2);
+    expected = [[5],[11]];
+    expect(result).toStrictEqual(expected);
+})
+
 
 test("Testing Comparison operators", () => {
     let input_1, input_2, result, expected;

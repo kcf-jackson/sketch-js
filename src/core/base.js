@@ -38,6 +38,20 @@ const which = typed('which', {
 })
 
 
+const seq = typed('seq_by', {
+    'number, number': function(from, to) {
+    	return seq(from, to, Math.sign(to - from));
+    },
+    'number, number, number': function(from = 1, to = 1, by = 1) {
+        let res = [], s = Math.sign(by);
+        for (let i = 0; s * (from + i * by) <= s * to; i++) {
+    		res.push(from + i * by);
+    	}
+    	return res;
+    }
+})
+
+
 export * from "./base/distributions.js"
 export * from "./base/funprog.js"
 export * from "./base/group_generic.js"
@@ -46,4 +60,4 @@ export * from "./base/sets.js"
 export * from "./base/stats.js"
 export * from "./base/utils.js"
 // export * from "./base/extra.js"
-export { length, typeOf as typeof, which}
+export { length, typeOf as typeof, which, seq }

@@ -16,7 +16,9 @@ R.import(RArray);
 
 // b. DataFrame
 const isRDataFrame = x => (x && (x instanceof DataFrame))
+const isRGroupedDataFrame = x => (x && x.df && (x.df instanceof DataFrame))
 R.typed.addType({name: 'dataframe', test: isRDataFrame}) 
+R.typed.addType({name: 'dataframe-grouped', test: isRGroupedDataFrame})
 R.import(RDataFrame)
 
 // c. List

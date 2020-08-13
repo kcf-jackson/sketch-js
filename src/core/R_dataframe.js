@@ -1,5 +1,6 @@
 import DataFrame from 'dataframe-js';
 import * as R_array from "./R_array.js";
+import { all, intersection } from "ramda";
 import { create, typedDependencies, typeOfDependencies } from "mathjs";
 const { typed, typeOf } = create({
     typedDependencies, typeOfDependencies
@@ -10,6 +11,11 @@ const { typed, typeOf } = create({
 typed.addType({
     name: 'dataframe',
     test: x => (x && (x instanceof DataFrame))
+}) 
+
+typed.addType({
+    name: 'dataframe-grouped',
+    test: x => (x && x.df && (x.df instanceof DataFrame))
 }) 
 
 // Constructor
@@ -209,54 +215,86 @@ const rbind = typed('rbind', {
 })
 
 
-// const mutate = typed('mutate', {
-//     'dataframe, string, Function': function(df0, columnName, func) {
-//         return df0.withColumn(columnName, func);
-//     }
-// })
+const mutate = typed('mutate', {
+    'dataframe, string, function': function(df0, columnName, func) {
+        return df0.withColumn(columnName, func);
+    }
+})
 
-// const select = typed('select', {
-//     'dataframe, ...string': function(df0, values) {
-//         return df0.select(...values);
-//     }
-// })
+const select = typed('select', {
+    'dataframe, ...string': function(df0, values) {
+        return df0.select(...values);
+    }
+})
 
-// const filter = typed('filter', {
-//     'dataframe, Function | Object': function(df0, condition) {
-//         return df0.filter(condition);
-//     }
-// })
+const filter = typed('filter', {
+    'dataframe, function': function(df0, func) {
+        return df0.filter(func);
+    }
+})
 
-// const summarise = typed('summarise', {
-//     'dataframe'
-// })
+const group_by = typed('group_by', {
+    'dataframe, string': function(df0, columnName) {
+        return df0.groupBy(columnName);
+    },
+    'dataframe, Array': function(df0, columnName) {
+        return df0.groupBy(...columnName);
+    }
+})
 
-// const arrange = typed('arrange', {
-//     'dataframe, string': function(df0, colNames) {
-//         df0.sortBy(colNames);
-//         return df0;
-//     },
-//     // duplicate for optional arguments
-//     'dataframe, string, boolean': function(df0, colNames, reverse = false) {
-//         df0.sortBy(colNames, reverse);
-//         return df0;
-//     },
-//     'dataframe, Array': function(df0, colNames) {
-//         if (!all0(colNames.map(x => typeOf(x) === 'string'))) {
-//             throw "colNames must contain only strings."
-//         }
-//         df0.sortBy(colNames);
-//         return df0;
-//     },
-//     // duplicate for optional arguments
-//     'dataframe, Array, boolean': function(df0, colNames, reverse = false) {
-//         if (!all0(colNames.map(x => typeOf(x) === 'string'))) {
-//             throw "colNames must contain only strings."
-//         }
-//         df0.sortBy(colNames, reverse);
-//         return df0;
-//     }
-// })
+const count = typed('count', {
+    'dataframe, string': function(df0, columnName) {
+        return df0.groupBy(columnName).
+                   aggregate(group => group.count()).
+                   rename('aggregation', 'n');
+    },
+    'dataframe, Array': function(df0, columnName) {
+        return df0.groupBy(...columnName).
+                   aggregate(group => group.count()).
+                   rename('aggregation', 'n');
+    }
+})
+
+
+const summarise = typed('summarise', {
+    'dataframe-grouped, string, function': function(grouped_df0, columnName, func) {
+        return grouped_df0.aggregate(func).rename('aggregation', columnName);
+    },
+    'dataframe-grouped, Array, Array': function(grouped_df0, columnName, func) {
+        let dfs = columnName.map(function(cname, i) {
+            grouped_df0.aggregate(func[i]).rename('aggregation', cname);
+        });
+        let groupColumnNames = dfs.map(listColumns).reduce(intersection);
+        return dfs.reduce((df1, df2) => df1.leftJoin(df2, groupColumnNames));
+    },
+})
+
+const arrange = typed('arrange', {
+    'dataframe, string': function(df0, colNames) {
+        df0.sortBy(colNames);
+        return df0;
+    },
+    // duplicate for optional arguments
+    'dataframe, string, boolean': function(df0, colNames, reverse = false) {
+        df0.sortBy(colNames, reverse);
+        return df0;
+    },
+    'dataframe, Array': function(df0, colNames) {
+        if (!all(colNames.map(x => typeOf(x) === 'string'))) {
+            throw "colNames must contain only strings."
+        }
+        df0.sortBy(colNames);
+        return df0;
+    },
+    // duplicate for optional arguments
+    'dataframe, Array, boolean': function(df0, colNames, reverse = false) {
+        if (!all(colNames.map(x => typeOf(x) === 'string'))) {
+            throw "colNames must contain only strings."
+        }
+        df0.sortBy(colNames, reverse);
+        return df0;
+    }
+})
 
 const print = typed("print", {
     "dataframe": x => x.show()
@@ -272,9 +310,12 @@ export {
     colnames,
     dim,
     print,
-    rbind
-    // mutate: mutate,
-    // filter: filter,
-    // select: select,
-    // arrange: arrange
+    rbind,
+    mutate,
+    filter,
+    select,
+    arrange,
+    group_by,
+    summarise,
+    count
 }

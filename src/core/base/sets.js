@@ -6,20 +6,18 @@ import {
     setDistinctDependencies,
     setUnionDependencies, setIntersectDependencies,
     setDifferenceDependencies, setSymDifferenceDependencies,
-    setSizeDependencies, setIsSubsetDependencies,
-    setMultiplicityDependencies
+    setSizeDependencies, setIsSubsetDependencies
 } from "mathjs";
 
 const { 
     typed, 
     setDistinct, setUnion, setIntersect, setDifference, setSymDifference,
-    setSize, setIsSubset, setMultiplicity
+    setSize, setIsSubset
 } = create(
     { typedDependencies, setDistinctDependencies,
         setUnionDependencies, setIntersectDependencies,
         setDifferenceDependencies, setSymDifferenceDependencies,
-        setSizeDependencies, setIsSubsetDependencies,
-        setMultiplicityDependencies },
+        setSizeDependencies, setIsSubsetDependencies },
     { matrix: 'Array' }
 )
 
@@ -121,6 +119,5 @@ export {
     is_element, 
     // table
     setIsSubset as is_subset, 
-    setsymdiff, 
-    setMultiplicity as count // extra
+    setsymdiff
 }

@@ -7,6 +7,7 @@ import {
 
     addDependencies, 
     subtractDependencies, 
+    multiplyDependencies, 
     dotMultiplyDependencies, 
     dotPowDependencies,
     modDependencies,
@@ -69,7 +70,7 @@ import {
 } from "mathjs";
 
 const { 
-    typed, add, subtract, dotMultiply, dotPow, mod, dotDivide,
+    typed, add, subtract, multiply, dotMultiply, dotPow, mod, dotDivide,
     equal, larger, smaller, unequal, smallerEq, largerEq,
     and, or, not, xor, 
     pi, abs, sign, sqrt, floor, ceil, fix, round, 
@@ -378,8 +379,9 @@ Export
 ---------------------------------------------------------*/
 
 export {    
-    // Arith: "+", "-", "*", "^", "%%", "%/%", "/"
+    // Arith: "+", "-", "*", "^", "%%", "%/%", "/", ("%*%" extra)
     add, subtract,
+    multiply as matMultiply,
     dotMultiply as multiply,
     dotPow as pow,
     mod,
