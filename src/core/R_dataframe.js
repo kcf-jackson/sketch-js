@@ -93,23 +93,23 @@ const dim = typed('dim', {
 // Extract-Assignment
 const dfExtractAssign = typed('extractAssign', {
     // By column (one-argument index)
-    'dataframe, string, null | undefined | number | string | boolean': function(x, ind, val) {
+    'dataframe, null | undefined | number | string | boolean, string': function(x, val, ind) {
         return x.withColumn(ind, () => val);
     },
-    'dataframe, string, Array': function(x, ind, val) {
+    'dataframe, Array, string': function(x, val, ind) {
         if (val.length != x.count()) {
             throw new Error("Length of the replacement does not match the dataframe.")
         }
         return x.withColumn(ind, (row, index) => val[index]);
     },
-    'dataframe, number, null | undefined | number | string | boolean | Array': function(x, ind, val) {
-        return dfExtractAssign(x, colnames(x)[ind], val);
+    'dataframe, null | undefined | number | string | boolean | Array, number': function(x, val, ind) {
+        return dfExtractAssign(x, val, colnames(x)[ind]);
     },
-    'dataframe, Array, null | undefined | number | string | boolean': function(x, ind, val) {
+    'dataframe, null | undefined | number | string | boolean, Array': function(x, val, ind) {
         let strInd = getIndexInStr(x, ind);
-        return strInd.reduce((acc, i) => dfExtractAssign(acc, i, val), x);
+        return strInd.reduce((acc, i) => dfExtractAssign(acc, val, i), x);
     },
-    'dataframe, Array, Array': function(x, ind, val) {
+    'dataframe, Array, Array': function(x, val, ind) {
         let nrow0 = x.count(), ncol0 = colnames(x).length;
         if (R_array.dim(val)[0] != nrow0) {
             throw new Error("The number of rows of the replacement does not match the dataframe.")
@@ -122,58 +122,58 @@ const dfExtractAssign = typed('extractAssign', {
             function(acc, i, index) {
                 // :: dataframe -> column string -> column index -> dataframe
                 let rhs = R_array.extract(val, R_array.emptyIndex(val, 0), index);
-                return dfExtractAssign(acc, i, R_array.c(rhs));
+                return dfExtractAssign(acc, R_array.c(rhs), i);
             },
             x // initial value
         );
         
     },
     // By row and column (two-argument index)
-    'dataframe, number, number | string, null | undefined | number | string | boolean': 
-        function(x, i, j, val) {
+    'dataframe, null | undefined | number | string | boolean, number, number | string': 
+        function(x, val, i, j) {
             return x.setRow(i, row => row.set(getIndexInStr(x, j), val));
         },
-    'dataframe, number, number | string, Array': 
-        function(x, i, j, val) {
+    'dataframe, Array, number, number | string': 
+        function(x, val, i, j) {
             if (val.length != 1) {
                 throw new Error("Replacement length does not match index length.")
             }
             return x.setRow(i, row => row.set(getIndexInStr(x, j), val[0]));
         },
-    'dataframe, Array, number | string, null | undefined | number | string | boolean': 
-        function(x, i, j, val) {
+    'dataframe, null | undefined | number | string | boolean, Array, number | string': 
+        function(x, val, i, j) {
             return i.reduce(
                 // :: dataframe -> integer -> dataframe
-                (acc, rowIndex) => dfExtractAssign(acc, rowIndex, j, val),
+                (acc, rowIndex) => dfExtractAssign(acc, val, rowIndex, j),
                 x  // initial value
             )
         },
-    'dataframe, Array, number | string, Array': 
-        function(x, i, j, val) {
+    'dataframe, Array, Array, number | string': 
+        function(x, val, i, j) {
             if (i.length != val.length) {
                 throw new Error("Replacement length does not matcht the row index length.")
             }
             return i.reduce(
                 // :: dataframe -> integer -> dataframe
-                (acc, rowIndex, ind) => dfExtractAssign(acc, rowIndex, j, val[ind]),
+                (acc, rowIndex, ind) => dfExtractAssign(acc, val[ind], rowIndex, j),
                 x  // initial value
             )
         },
-    'dataframe, number, Array, null | undefined | number | string | boolean | Array': 
-        function(x, i, j, val) {
+    'dataframe, null | undefined | number | string | boolean | Array, number, Array': 
+        function(x, val, i, j) {
             let str_j = getIndexInStr(x, j)
             return x.setRow(i, row => setMultipleColumns(row, str_j, val));
         },
-    'dataframe, Array, Array, null | undefined | number | string | boolean': 
-        function(x, i, j, val) {
+    'dataframe, null | undefined | number | string | boolean, Array, Array': 
+        function(x, val, i, j) {
             return i.reduce(
                 // :: dataframe -> integer -> dataframe
-                (acc, rowIndex) => dfExtractAssign(acc, rowIndex, j, val),
+                (acc, rowIndex) => dfExtractAssign(acc, val, rowIndex, j),
                 x  // initial value
             )
         },
     'dataframe, Array, Array, Array': 
-        function(x, i, j, val) {
+        function(x, val, i, j) {
             let nrow0 = i.length, ncol0 = j.length;
             if (R_array.dim(val)[0] != nrow0) {
                 throw new Error("The number of rows of the replacement does not match the dataframe.")
@@ -185,7 +185,7 @@ const dfExtractAssign = typed('extractAssign', {
                 // :: dataframe -> integer -> dataframe
                 function(acc, rowIndex) {
                     let rowVal = R_array.extract(val, rowIndex, R_array.emptyIndex(val, 1));
-                    return dfExtractAssign(acc, rowIndex, j, R_array.c(rowVal));
+                    return dfExtractAssign(acc, R_array.c(rowVal), rowIndex, j);
                 },
                 x  // initial value
             )
@@ -214,10 +214,18 @@ const rbind = typed('rbind', {
     'dataframe, dataframe': (df1, df2) => df1.union(df2)
 })
 
-
 const mutate = typed('mutate', {
     'dataframe, string, function': function(df0, columnName, func) {
         return df0.withColumn(columnName, func);
+    },
+    'dataframe, Array, Array': function(df0, columnName, func) {
+        let col = columnName.shift()
+        ,   fun = func.shift();
+        let res = df0.withColumn(col, fun); 
+        if (columnName.length == 0) {
+            return res;
+        }
+        return mutate(res, columnName, func);
     }
 })
 
@@ -234,27 +242,18 @@ const filter = typed('filter', {
 })
 
 const group_by = typed('group_by', {
-    'dataframe, string': function(df0, columnName) {
-        return df0.groupBy(columnName);
-    },
-    'dataframe, Array': function(df0, columnName) {
+    'dataframe, ...string': function(df0, columnName) {
         return df0.groupBy(...columnName);
     }
 })
 
 const count = typed('count', {
-    'dataframe, string': function(df0, columnName) {
-        return df0.groupBy(columnName).
-                   aggregate(group => group.count()).
-                   rename('aggregation', 'n');
-    },
-    'dataframe, Array': function(df0, columnName) {
+    'dataframe, ...string': function(df0, columnName) {
         return df0.groupBy(...columnName).
                    aggregate(group => group.count()).
                    rename('aggregation', 'n');
     }
 })
-
 
 const summarise = typed('summarise', {
     'dataframe-grouped, string, function': function(grouped_df0, columnName, func) {

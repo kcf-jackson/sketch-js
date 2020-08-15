@@ -93,104 +93,104 @@ test("Testing dataframe: extractAssign", () => {
   // string, scalar
   let input, result, expected;
   input = R.data_frame({ x: [1,2,3], y: [4,5,6] });
-  result = R.extractAssign(input, 'x', 1);
+  result = R.extractAssign(input, 1, 'x');
   expected = R.data_frame({ x: [1,1,1], y: [4,5,6] });
   expect(result).toStrictEqual(expected);
   // string, Array
-  result = R.extractAssign(input, 'x', [7,8,9]);
+  result = R.extractAssign(input, [7,8,9], 'x');
   expected = R.data_frame({ x: [7,8,9], y: [4,5,6] });
   expect(result).toStrictEqual(expected);
 
-  result = R.extractAssign(input, 'y', [7,8,9]);
+  result = R.extractAssign(input, [7,8,9], 'y');
   expected = R.data_frame({ x: [1,2,3], y: [7,8,9] });
   expect(result).toStrictEqual(expected);
 
-  result = () => {R.extractAssign(input, 'y', [7,8])};
+  result = () => {R.extractAssign(input, [7,8], 'y')};
   expect(result).toThrow();
 
   // number, scalar
-  result = R.extractAssign(input, 0, 1);
+  result = R.extractAssign(input, 1, 0);
   expected = R.data_frame({ x: [1,1,1], y: [4,5,6] });
   expect(result).toStrictEqual(expected);
   // number, Array
-  result = R.extractAssign(input, 0, [7,8,9]);
+  result = R.extractAssign(input, [7,8,9], 0);
   expected = R.data_frame({ x: [7,8,9], y: [4,5,6] });
   expect(result).toStrictEqual(expected);
 
-  result = R.extractAssign(input, 1, [7,8,9]);
+  result = R.extractAssign(input, [7,8,9], 1);
   expected = R.data_frame({ x: [1,2,3], y: [7,8,9] });
   expect(result).toStrictEqual(expected);
 
   // Array, number
-  result = R.extractAssign(input, ['x','y'], 99);
+  result = R.extractAssign(input, 99, ['x','y']);
   expected = R.data_frame({ x: [99,99,99], y: [99,99,99] });
   expect(result).toStrictEqual(expected);
 
   // Array, Array
-  result = R.extractAssign(input, ['x','y'], [[-1,-2],[-3,-4],[-5,-6]]);
+  result = R.extractAssign(input, [[-1,-2],[-3,-4],[-5,-6]], ['x','y']);
   expected = R.data_frame({ x: [-1,-3,-5], y: [-2,-4,-6] });
   expect(result).toStrictEqual(expected);
   
-  result = () => {R.extractAssign(input, ['x','y'], [[-1],[-4],[-6]])};
+  result = () => {R.extractAssign(input, [[-1],[-4],[-6]], ['x','y'])};
   expect(result).toThrow();
 
-  result = () => {R.extractAssign(input, ['x','y'], [[-1,-2]])};
+  result = () => {R.extractAssign(input, [[-1,-2]], ['x','y'])};
   expect(result).toThrow();
 
   // two-argument index
   input = R.data_frame({ x: [1,2,3], y: [4,5,6] });
   // number-string-scalar
-  result = R.extractAssign(input, 1, 'x', 7);
+  result = R.extractAssign(input, 7, 1, 'x');
   expected = R.data_frame({ x: [1,7,3], y: [4,5,6] });
   expect(result).toStrictEqual(expected);
   // number-string-Array
-  result = R.extractAssign(input, 1, 'y', [99]);
+  result = R.extractAssign(input, [99], 1, 'y');
   expected = R.data_frame({ x: [1,2,3], y: [4,99,6] });
   expect(result).toStrictEqual(expected);
 
-  result = () => {R.extractAssign(input, 1, 'y', [1,2])};
+  result = () => {R.extractAssign(input, [1,2], 1, 'y')};
   expect(result).toThrow();
   
   // Array-string-scalar
-  result = R.extractAssign(input, [0,1], 'x', 99);
+  result = R.extractAssign(input, 99, [0,1], 'x');
   expected = R.data_frame({ x: [99,99,3], y: [4,5,6] });
   expect(result).toStrictEqual(expected);
   // Array-string-Array
-  result = R.extractAssign(input, [0,1], 'x', [7,77]);
+  result = R.extractAssign(input, [7,77], [0,1], 'x');
   expected = R.data_frame({ x: [7,77,3], y: [4,5,6] });
   expect(result).toStrictEqual(expected);
   
-  result = () => {R.extractAssign(input, [0,1], 'x', [7])}; // "length-one-vector matter"
+  result = () => {R.extractAssign(input, [7], [0,1], 'x')}; // "length-one-vector matter"
   expect(result).toThrow();
 
-  result = () => {R.extractAssign(input, [0,1], 'x', [7,8,9])}; 
+  result = () => {R.extractAssign(input, [7,8,9], [0,1], 'x')}; 
   expect(result).toThrow();
 
   // number-Array-scalar
-  result = R.extractAssign(input, 0, ['x','y'], 22);
+  result = R.extractAssign(input, 22, 0, ['x','y']);
   expected = R.data_frame({ x: [22,2,3], y: [22,5,6] });
   expect(result).toStrictEqual(expected);
   // number-Array-Array
-  result = R.extractAssign(input, 0, ['x','y'], [22,88]);
+  result = R.extractAssign(input, [22,88], 0, ['x','y']);
   expected = R.data_frame({ x: [22,2,3], y: [88,5,6] });
   expect(result).toStrictEqual(expected);
   
-  result = () => {R.extractAssign(input, 0, ['x','y'], [1,2,3])};
+  result = () => {R.extractAssign(input, [1,2,3], 0, ['x','y'])};
   expect(result).toThrow();
 
   // Array-Array-Array
-  result = R.extractAssign(input, [0,1], ['x','y'], 10);
+  result = R.extractAssign(input, 10, [0,1], ['x','y']);
   expected = R.data_frame({ x: [10,10,3], y: [10,10,6] });
   expect(result).toStrictEqual(expected);
 
-  result = R.extractAssign(input, [0,1], ['x','y'], [[-1,-2],[-3,-4]]);
+  result = R.extractAssign(input, [[-1,-2],[-3,-4]], [0,1], ['x','y']);
   expected = R.data_frame({ x: [-1,-3,3], y: [-2,-4,6] });
   expect(result).toStrictEqual(expected);
 
-  result = () => {R.extractAssign(input, [0,1], ['x','y'], [[-1],[-4]])};
+  result = () => {R.extractAssign(input, [[-1],[-4]], [0,1], ['x','y'])};
   expect(result).toThrow();
 
-  result = () => {R.extractAssign(input, [0,1], ['x','y'], [[-1,-2]])};
+  result = () => {R.extractAssign(input, [[-1,-2]], [0,1], ['x','y'])};
   expect(result).toThrow();
 })
 
@@ -218,6 +218,16 @@ test("Testing dataframe: mutate", () => {
   expected = R.data_frame({
     c1: [1, 4, 2], c2: [6, 2, 10], c3: [4, 4, 4], 
     new_col: [2, 8, 4]
+  });
+  expect(result).toStrictEqual(expected);
+
+  result = R.mutate(
+    df0, ['new_col', 'new_col2'], 
+    [row => row.get('c1') * 2, row => row.get('c2') * 2]
+  );
+  expected = R.data_frame({
+    c1: [1, 4, 2], c2: [6, 2, 10], c3: [4, 4, 4], 
+    new_col: [2, 8, 4], new_col2: [12, 4, 20]
   });
   expect(result).toStrictEqual(expected);
 })
@@ -266,7 +276,7 @@ test("Testing dataframe: count", () => {
     expected = R.data_frame({ column3: ['a', 'b'], n: [2, 2] });
     expect(result).toStrictEqual(expected);
 
-    result = R.count(df0, ['column3', 'column4']);
+    result = R.count(df0, 'column3', 'column4');
     expected = R.data_frame({ 
       column3: ['a', 'b', 'b'], 
       column4: ['c', 'd', 'b'],
@@ -293,7 +303,7 @@ test("Testing dataframe: summarise", () => {
     expect(result).toStrictEqual(expected);
 
     result = R.summarise(
-      R.group_by(df0, ['column3', 'column4']),
+      R.group_by(df0, 'column3', 'column4'),
       'n', group => group.stat.mean('column1'),
     );
     expected = R.data_frame({ 

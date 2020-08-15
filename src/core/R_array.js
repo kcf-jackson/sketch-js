@@ -8,11 +8,14 @@ import {
     indexDependencies,
     prodDependencies,
     rangeDependencies,
-    sizeDependencies
+    sizeDependencies,
+    deepEqualDependencies
 } from "mathjs";
+import { length } from  "./base.js";
 
 const {
-    typed, flatten, transpose, reshape, subset, index, prod, range, size
+    typed, flatten, transpose, reshape, subset, index, prod, range, size,
+    deepEqual
 } = create({
     typedDependencies,
     flattenDependencies,
@@ -22,7 +25,8 @@ const {
     indexDependencies,
     prodDependencies,
     rangeDependencies,
-    sizeDependencies
+    sizeDependencies,
+    deepEqualDependencies
 }, { matrix: 'Array' })
 
 // Combine values into a vector
@@ -93,9 +97,28 @@ const arrayExtractAssign = typed('extractAssign', {
         }
     },
     'Array, Array, ...number | Array': function(x, value, indices) {
+        // Convert if index dimension is 1 and x dimension > 1
+        if ((indices.length == 1) && (size(x).length > 1)) {
+            return reshape(
+                subset(flatten(x), index(...indices), flatten(value)),
+                size(x));
+        }
+
+        // Reshape if the dimension of the replacement value does not 
+        // match the index
+        let indicesShape = indices.map(x => length(x));
+        if (!deepEqual(size(value), indicesShape)) { 
+            value = reshape(value, indicesShape);
+        }
+
+        // Replace array by value
         return subset(x, index(...indices), value);
     }
 })
+
+// const copy = function(from, to) {
+//     from.map((el,i) => to[i] = el);
+// }
 
 
 const dim = typed('dim', {

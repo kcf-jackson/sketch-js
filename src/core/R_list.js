@@ -50,7 +50,7 @@ const emptyIndex = typed('emptyIndex', {
 })
 
 const listExtractAssign = typed('extractAssign', {
-    'list, number | string, any': function(x, index, value) {
+    'list, any, number | string': function(x, value, index) {
         if (base_length(value) > 1) {
             throw new Error("Number of items to replace does not match the replacement length")
         }
@@ -58,7 +58,7 @@ const listExtractAssign = typed('extractAssign', {
         return x;
     },
 
-    'list, Array, any': function(x, index, value) {
+    'list, any, Array': function(x, value, index) {
         if (base_length(value) == 1) {
             value = Array(index.length).fill(value);
         }
@@ -72,7 +72,7 @@ const listExtractAssign = typed('extractAssign', {
             throw new Error("Invalid subscripts: a subscript must be a number or a string.")
         }
     
-        index.forEach((ind, i) => listExtractAssign(x, ind, value[indexName(value, i)]))
+        index.forEach((ind, i) => listExtractAssign(x, value[indexName(value, i)], ind))
         return x;
     }
 }); 
@@ -100,18 +100,18 @@ const listExtract2 = typed('extract2', {
     }
 })
 
-const listExtract2Assign = typed('extractAssign', {
-    'list, number, any': function(x, index, value) {
+const listExtract2Assign = typed('extract2Assign', {
+    'list, any, number': function(x, value, index) {
         x[Object.keys(x)[index]] = value;
         return x;
     },
 
-    'list, string, any': function(x, index, value) {
+    'list, any, string': function(x, value, index) {
         x[index] = value;
         return x;
     },
 
-    'list, Array, any': function(x, index, value) {
+    'list, any, Array': function(x, value, index) {
        let y = x;
        while (index.length > 1) { // must leave the last one to modify by reference
             y = y[indexName(y, index.shift())]

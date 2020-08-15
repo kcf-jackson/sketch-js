@@ -137,13 +137,23 @@ test("Testing matrix: extractAssign", () => {
     expect(result).toStrictEqual(expected);
 
     input = R.matrix2(R.c(1,2,3,4), 2, 2);
-    result = R.extractAssign(input, [[4,3],[2,1]], R.emptyIndex(input, 0), R.emptyIndex(input, 1));
+    result = R.extractAssign(input, [4,3,2,1], [0,1], [0,1]);
     expected = [[4,3],[2,1]];
     expect(result).toStrictEqual(expected);
 
     input = R.matrix2(R.c(1,2,3,4), 2, 2);
-    result = R.extractAssign(input, [[4,3],[2,1]], R.emptyIndex(input, 0), R.emptyIndex(input, 1));
+    result = R.extractAssign(input, [4,3,2,1], [0,1,2,3]);
     expected = [[4,3],[2,1]];
+    expect(result).toStrictEqual(expected);
+
+    input = R.matrix2(R.c(1,2,3,4), 2, 2);
+    result = R.extractAssign(input, [[4,3]], 0, R.emptyIndex(input, 1));
+    expected = [[4,3],[2,4]];
+    expect(result).toStrictEqual(expected);
+
+    input = R.matrix2(R.c(1,2,3,4), 2, 2);
+    result = R.extractAssign(input, [[4],[2]], R.emptyIndex(input, 0), 0);
+    expected = [[4,3],[2,4]];
     expect(result).toStrictEqual(expected);
 })
 
@@ -202,11 +212,6 @@ test("Testing array: extract", () => {
     result = R.extract(input, R.emptyIndex(input, 0), 0, 0);
     expected = [[[1]], [[5]]];
     expect(result).toStrictEqual(expected);
-
-    // input = R.array(R.c(1,2,3,4,5,6,7,8), [2,2,2]);
-    // result = R.extract(input, R.emptyIndex(input, 0), 0, 0);
-    // expected = [[[1]], [[5]]];
-    // expect(result).toStrictEqual(expected);
 })
 
 test("Testing array: extractAssign", () => {

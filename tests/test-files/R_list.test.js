@@ -57,76 +57,76 @@ test("Testing list: extract2", () => {
 test("Testing list: extractAssign", () => {
     let input, result, expected;
     input = {x1:1, y1:2, z1:3};
-    result = R.extractAssign(input, 0, 99);
+    result = R.extractAssign(input, 99, 0);
     expected = {x1:99, y1:2, z1:3};
     expect(result).toStrictEqual(expected);
 
     input = {x1:1, y1:2, z1:3};
-    result = R.extractAssign(input, 'z1', 99);
+    result = R.extractAssign(input, 99, 'z1');
     expected = {x1:1, y1:2, z1:99};
     expect(result).toStrictEqual(expected);
 
     input = {x1:1, y1:2, z1:3};
-    result = R.extractAssign(input, 'z1', [99]);
+    result = R.extractAssign(input, [99], 'z1');
     expected = {x1:1, y1:2, z1:99};
     expect(result).toStrictEqual(expected);
 
     input = {x1:1, y1:2, z1:3};
-    result = R.extractAssign(input, 'z1', {a:99});
+    result = R.extractAssign(input, {a:99}, 'z1');
     expected = {x1:1, y1:2, z1:99};
     expect(result).toStrictEqual(expected);
 
     // Array index
     input = {x1:1, y1:2, z1:3};
-    result = R.extractAssign(input, [0,1], [99, -99]);
+    result = R.extractAssign(input, [99, -99], [0,1]);
     expected = {x1:99, y1:-99, z1:3};
     expect(result).toStrictEqual(expected);
 
     input = {x1:1, y1:2, z1:3};
-    result = R.extractAssign(input, ['x1','z1'], {a:99, b:-99});
+    result = R.extractAssign(input, {a:99, b:-99}, ['x1','z1']);
     expected = {x1:99, y1:2, z1:-99};
     expect(result).toStrictEqual(expected);
 
     input = {x1:1, y1:2, z1:3};
-    result = R.extractAssign(input, ['x1','z1'], 123);
+    result = R.extractAssign(input, 123, ['x1','z1']);
     expected = {x1:123, y1:2, z1:123};
     expect(result).toStrictEqual(expected);
 
     input = {x1:1, y1:2, z1:3};
-    result = R.extractAssign(input, ['x1','z1'], [123]);
+    result = R.extractAssign(input, [123], ['x1','z1']);
     expected = {x1:123, y1:2, z1:123};
     expect(result).toStrictEqual(expected);
 
     input = {x1:1, y1:2, z1:3};
-    result = R.extractAssign(input, ['x1','z1'], {a:123});
+    result = R.extractAssign(input, {a:123}, ['x1','z1']);
     expected = {x1:123, y1:2, z1:123};
     expect(result).toStrictEqual(expected);
 
     // Expect errors
-    expect(() => { R.extractAssign({x1:1, y1:2, z1:3}, 0, [1,2]) }).toThrow();
-    expect(() => { R.extractAssign({x1:1, y1:2, z1:3}, [0,1], [1,2,3]) }).toThrow();
-    expect(() => { R.extractAssign({x1:1, y1:2, z1:3}, [true,false], [1,2,3]) }).toThrow();
+    expect(() => { R.extractAssign({x1:1, y1:2, z1:3}, [1,2], 0) }).toThrow();
+    expect(() => { R.extractAssign({x1:1, y1:2, z1:3}, [1,2,3], [0,1]) }).toThrow();
+    expect(() => { R.extractAssign({x1:1, y1:2, z1:3}, [1,2,3], [true,false]) }).toThrow();
 })
 
 test("Testing list: extract2Assign", () => {
     let input, result, expected;
     input = {x1:1, y1:2, z1:3};
-    result = R.extract2Assign(input, 0, 99);
+    result = R.extract2Assign(input, 99, 0);
     expected = {x1:99, y1:2, z1:3};
     expect(result).toStrictEqual(expected);
     
     input = {x1:1, y1:2, z1:3};
-    result = R.extract2Assign(input, 'z1', 99);
+    result = R.extract2Assign(input, 99, 'z1');
     expected = {x1:1, y1:2, z1:99};
     expect(result).toStrictEqual(expected);
 
     input = {x1: {x2:4, x3:5}, y1:2, z1:3};
-    result = R.extract2Assign(input, [0,1], 99);
+    result = R.extract2Assign(input, 99, [0,1]);
     expected = {x1: {x2:4, x3:99}, y1:2, z1:3};
     expect(result).toStrictEqual(expected);
 
     input = {x1: {x2:4, x3:5}, y1:2, z1:3};
-    result = R.extract2Assign(input, ['x1','x2'], 99);
+    result = R.extract2Assign(input, 99, ['x1','x2']);
     expected = {x1: {x2:99, x3:5}, y1:2, z1:3};
     expect(result).toStrictEqual(expected);
 })
