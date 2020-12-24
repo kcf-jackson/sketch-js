@@ -6,9 +6,21 @@ import {zipWith, curry, __ as _, reduce, head, tail} from "ramda";
 
 /**
  * Return the name of the function arguments.
- * @param {function} func 
+ * 
+ * @param {function} func A function.
+ * 
+ * @returns A character array.
+ * 
+ * @example
+ * function max(a, b) {
+ *     return a > b ? a : b;
+ * }
+ * // returns ['a', 'b']
+ * formalArgs(max)
+ * 
+ * @exports
  */
-function formalArgs(func) {
+const formalArgs = function(func) {
     let funStr = func.toString();
     let args = funStr.slice(funStr.indexOf('(') + 1, funStr.indexOf(')'));
     return args.split(",").map(x => x.split("=")[0].trim());

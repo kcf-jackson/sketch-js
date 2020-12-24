@@ -54,15 +54,37 @@ test("Testing base::seq_by", () => {
     expected = [1,3,5,7,9];
     expect(result).toStrictEqual(expected);
 
-    result = R.seq(10, 1, 2); 
-    expected = [];
-    expect(result).toStrictEqual(expected);
+    result = () => { R.seq(10, 1, 2) };
+    expect(result).toThrow();
 
     result = R.seq(5, 1); 
     expected = [5, 4, 3, 2, 1];
     expect(result).toStrictEqual(expected);
+
+    result = R.seq(4, -10, -4); 
+    expected = [4, 0, -4, -8];
+    expect(result).toStrictEqual(expected);
+
+    result = R.seq(1, 10, null, 5); 
+    expected = [1, 3.25, 5.5, 7.75, 10];
+    expect(result).toStrictEqual(expected);
 })
 
+
+test("Testing base::rep", () => {
+    let input, result, expected;
+    result = R.rep(1, 3); 
+    expected = [1, 1, 1];
+    expect(result).toStrictEqual(expected);
+
+    result = R.rep([1,2], 2); 
+    expected = [1, 2, 1, 2];
+    expect(result).toStrictEqual(expected);
+
+    result = R.rep([1, 2], [3, 4]); 
+    expected = [1, 1, 1, 2, 2, 2, 2];
+    expect(result).toStrictEqual(expected);
+})
 
 // test("Testing base::digamma", () => {
 //     let input, result, expected;
