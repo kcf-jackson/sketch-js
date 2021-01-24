@@ -38,5 +38,5 @@ module.exports = [
     makeNodeConfig("./src/core/R_dataframe.js", "bin/modules"),
     // Top level
     makeNodeConfig("./src/R_core.js", "bin/dist", "production", "default"),
-    makeWebConfig("./src/R_core.js", "bin/dist", "production",)
+    makeWebConfig("./src/R_core.js", "bin/dist", "production")
 ];  
