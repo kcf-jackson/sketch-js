@@ -116,22 +116,13 @@ test("Testing setsymdiff", () => {
     expect(result).toStrictEqual(expected);
 })
 
-// test("Testing count", () => {
-//     let input_1, input_2, result, expected;
-//     input = [1,2,2,3,3,3];
-//     result = R.count(1, input);
-//     expected = 1;
-//     expect(result).toStrictEqual(expected);
-
-//     result = R.count(2, input);
-//     expected = 2;
-//     expect(result).toStrictEqual(expected);
-    
-//     result = R.count(3, input);
-//     expected = 3;
-//     expect(result).toStrictEqual(expected);
-
-//     result = R.count(4, input);
-//     expected = 0;
-//     expect(result).toStrictEqual(expected);
-// })
+test("Testing table", () => {
+    let input_1, input_2, result, expected;
+    input = [1,2,2,3,3,3,'a','a','b'];
+    result = R.table(input);
+    expect(result["1"]).toStrictEqual(1);
+    expect(result["2"]).toStrictEqual(2);
+    expect(result["3"]).toStrictEqual(3);
+    expect(result["a"]).toStrictEqual(2);
+    expect(result["b"]).toStrictEqual(1);
+})

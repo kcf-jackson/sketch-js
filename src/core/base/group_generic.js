@@ -5,15 +5,20 @@ import { zipWith, mapAccum, all, any, identity, flatten } from "ramda";
 import { 
     create, typedDependencies,
 
+    unaryMinusDependencies, 
+    unaryPlusDependencies,
+    multiplyDependencies, 
+    
     addDependencies, 
     subtractDependencies, 
-    multiplyDependencies, 
     dotMultiplyDependencies, 
     dotPowDependencies,
     modDependencies,
     dotDivideDependencies,
 
     equalDependencies,
+    equalTextDependencies,
+    deepEqualDependencies,
     largerDependencies,
     smallerDependencies,
     unequalDependencies,
@@ -70,8 +75,9 @@ import {
 } from "mathjs";
 
 const { 
-    typed, add, subtract, multiply, dotMultiply, dotPow, mod, dotDivide,
-    equal, larger, smaller, unequal, smallerEq, largerEq,
+    typed, unaryMinus, unaryPlus, 
+    add, subtract, multiply, dotMultiply, dotPow, mod, dotDivide,
+    equal, equalText, deepEqual, larger, smaller, unequal, smallerEq, largerEq,
     and, or, not, xor, 
     pi, abs, sign, sqrt, floor, ceil, fix, round, 
     exp, expm1, log, log10, log2, log1p, 
@@ -83,14 +89,19 @@ const {
 } = create(
     { 
         typedDependencies,
+        unaryMinusDependencies, 
+        unaryPlusDependencies,
         addDependencies, 
         subtractDependencies, 
+        multiplyDependencies, 
         dotMultiplyDependencies, 
         dotPowDependencies,
         modDependencies,
         dotDivideDependencies,
     
         equalDependencies,
+        equalTextDependencies,
+        deepEqualDependencies,
         largerDependencies,
         smallerDependencies,
         unequalDependencies,
@@ -373,12 +384,39 @@ const any2 = typed('any', {
 
 
 
+/*--------------------------------------------------------
+Operators
+---------------------------------------------------------*/
+
+const EQ = typed('EQ', {
+    'string, string': (x, y) => equalText(x, y),
+    'Array, Array': function(x, y) {
+        if (x.length != y.length) {
+            throw new Error("Dimension mismatch.")
+        }
+        return zipWith(EQ, x, y)
+    },
+    'any, any': (x, y) => equal(x, y)
+})
+
+const NEQ = typed('NEQ', {
+    'string, string': (x, y) => not(equalText(x, y)),
+    'Array, Array': function(x, y) {
+        if (x.length != y.length) {
+            throw new Error("Dimension mismatch.")
+        }
+        return zipWith(NEQ, x, y)
+    },
+    'any, any': (x, y) => unequal(x, y)
+})
+
 
 /*--------------------------------------------------------
 Export
 ---------------------------------------------------------*/
 
 export {    
+    unaryMinus, unaryPlus, 
     // Arith: "+", "-", "*", "^", "%%", "%/%", "/", ("%*%" extra)
     add, subtract,
     multiply as matMultiply,
@@ -389,10 +427,11 @@ export {
     dotDivide as divide,
     
     // Compare: "==", ">", "<", "!=", "<=", ">="
-    equal as EQ,
+    deepEqual as identical,
+    EQ as EQ,
     larger as GT,
     smaller as LT,
-    unequal as NEQ,
+    NEQ as NEQ,
     smallerEq as LEQ,
     largerEq as GEQ,
 

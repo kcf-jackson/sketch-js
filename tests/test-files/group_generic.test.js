@@ -203,6 +203,27 @@ test("Testing Comparison operators", () => {
     result = R.GEQ(input_1, input_2);
     expected = [true,true,true,true,true];
     expect(result).toStrictEqual(expected);
+
+    // EQ and NEQ string
+    input_1 = "abcde";
+    input_2 = "abc";
+
+    expect(R.EQ(input_1, input_1)).toStrictEqual(true);
+    expect(R.EQ(input_1, input_2)).toStrictEqual(false);
+    expect(R.EQ(input_2, input_2)).toStrictEqual(true);
+
+    expect(R.NEQ(input_1, input_1)).toStrictEqual(false);
+    expect(R.NEQ(input_1, input_2)).toStrictEqual(true);
+    expect(R.NEQ(input_2, input_2)).toStrictEqual(false);
+
+    // Array of string
+    input_1 = ["abc", "def"];
+    input_2 = ["abc", "ghi"];
+    expect(R.EQ(input_1, input_1)).toStrictEqual([true, true]);
+    expect(R.EQ(input_1, input_2)).toStrictEqual([true, false]);
+    
+    expect(R.NEQ(input_1, input_1)).toStrictEqual([false, false]);
+    expect(R.NEQ(input_1, input_2)).toStrictEqual([false, true]);
 })
 
 

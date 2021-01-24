@@ -101,13 +101,25 @@ const setsymdiff = function(x, y) {
 }
 
 
-// table = function(xs) {
-//     let set = setDistinct(xs)
-//     return {
-//         element: set, 
-//         count: set.map(el => setMultiplicity(el, xs))
-//     };
-// }
+/**
+ * Frequency table
+ * @param {Array} x A set; an array of elements.
+ * @return A JavaScript Object.
+ * @exports
+ */
+const table = function(x) {
+    let freq = {};
+    for (let i = 0; i < x.length; i++) {
+        let element = x[i]
+        if (freq[element]) {
+           freq[element]++;
+        } else {
+           freq[element] = 1;
+        }
+    }
+    return freq;
+};
+
 
 
 export {
@@ -117,7 +129,7 @@ export {
     setdiff, 
     setequal, 
     is_element, 
-    // table
+    table,
     setIsSubset as is_subset, 
     setsymdiff
 }

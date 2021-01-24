@@ -140,17 +140,21 @@ const length = typed('length', {
 //     }
 // })
 
-//Why array
-// const names = typed('names', { 
-//     'Array': x => x.names,
-//     'list': Object.keys
-// })
-// // Shallow copy
-// const append = typed('append', { 
-//     'list, list': function(x, values) {
-//         return {...x, ...values} 
-//     }
-// })
+const names = typed('names', { 
+    // 'Array': x => x.names,
+    'list': Object.keys
+})
+
+// Shallow copy
+const append = typed('append', { 
+    'list, list': function(x, values) {
+        return {...x, ...values} 
+    }
+})
+
+const print = typed("print", {
+    "list": x => console.log(x)
+})
 
 // // Implement unlist and relist instead
 // const as_vector = typed('as_vector', { 
@@ -174,8 +178,9 @@ export {
     listExtract2 as extract2,
     listExtractAssign as extractAssign,
     listExtract2Assign as extract2Assign,
-    length
+    length,
     // as_vector: as_vector,
-    // append: append,
-    // names: names
+    append,
+    names,
+    print
 };

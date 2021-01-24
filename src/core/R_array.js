@@ -29,7 +29,28 @@ const {
     deepEqualDependencies
 }, { matrix: 'Array' })
 
-// Combine values into a vector
+/**
+ * Combine values into a vector. 
+ * 
+ * (Note that the function does not check that the elements are of the same type.
+ * Users should enforce such constraint by themselves.)
+ * 
+ * @param {...number|character|boolean|Array} x Any number of values to be combined into a vector.
+ * 
+ * @return {Array} A JavaScript Array; the combined "vector".
+ * 
+ * @example
+ * // returns [1, 2, 3]
+ * c(1, 2, 3)
+ * @example
+ * // returns [1, 2, 3, 4]
+ * c(1, 2, c(3, 4))
+ * @example
+ * // returns ["a", "b", "c"]
+ * c("a", "b", "c")
+ * 
+ * @exports
+ */
 function c() {
     return flatten([...arguments]);
 }
@@ -81,21 +102,6 @@ const emptyIndex = typed('emptyIndex', {
 
 // Extract-Assignment
 const arrayExtractAssign = typed('extractAssign', {
-    'Array, boolean | number | string, ...number | Array': function(x, value, indices) {
-        let indexArray = index(...indices),
-            indexArrayDim = indexArray.size(),
-            indexArrayLen = prod(indexArrayDim),
-            indexArrayIsScaler = indexArrayLen === 1;
-        if (indexArrayIsScaler) {
-            // Both target and source are scalars
-            return subset(x, index(...indices), value);
-        } else {
-            // Construct Array if target is Array but source is scalar 
-            let values = Array(indexArrayLen).fill(value),
-                valueArray = reshape(values, indexArrayDim);
-            return subset(x, indexArray, valueArray);
-        }
-    },
     'Array, Array, ...number | Array': function(x, value, indices) {
         // Convert if index dimension is 1 and x dimension > 1
         if ((indices.length == 1) && (size(x).length > 1)) {
@@ -113,6 +119,21 @@ const arrayExtractAssign = typed('extractAssign', {
 
         // Replace array by value
         return subset(x, index(...indices), value);
+    },
+    'Array, any, ...number | Array': function(x, value, indices) {
+        let indexArray = index(...indices),
+            indexArrayDim = indexArray.size(),
+            indexArrayLen = prod(indexArrayDim),
+            indexArrayIsScaler = indexArrayLen === 1;
+        if (indexArrayIsScaler) {
+            // Both target and source are scalars
+            return subset(x, index(...indices), value);
+        } else {
+            // Construct Array if target is Array but source is scalar 
+            let values = Array(indexArrayLen).fill(value),
+                valueArray = reshape(values, indexArrayDim);
+            return subset(x, indexArray, valueArray);
+        }
     }
 })
 
@@ -126,6 +147,10 @@ const dim = typed('dim', {
     'Array': x => size(x)
 })
 
+const print = typed("print", {
+    "null | undefined | number | string | boolean | Object | Array | function": x => console.log(x)
+})
+
 
 export {
     c,
@@ -134,5 +159,6 @@ export {
     arrayExtract as extract,
     emptyIndex,
     arrayExtractAssign as extractAssign,
-    dim
+    dim,
+    print
 }

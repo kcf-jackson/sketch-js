@@ -131,23 +131,23 @@ test("Testing list: extract2Assign", () => {
     expect(result).toStrictEqual(expected);
 })
 
-// test("Testing list: names", () => {
-//     let result = R.names({x1:1, y1:2, z1:3});
-//     let expected = ['x1', 'y1', 'z1'];
-//     expect(result).toStrictEqual(expected);
-// })
+test("Testing list: names", () => {
+    let result = R.names({x1:1, y1:2, z1:3});
+    let expected = ['x1', 'y1', 'z1'];
+    expect(result).toStrictEqual(expected);
+})
 
-// test("Testing list: append", () => {
-//     let result = R.append(
-//         {x1:1, y1:2, z1:3},
-//         {x2:1, y2:2, z2:3}
-//     )
-//     let expected = {
-//         x1:1, y1:2, z1:3, 
-//         x2:1, y2:2, z2:3
-//     }
-//     expect(result).toStrictEqual(expected);
-// })
+test("Testing list: append", () => {
+    let result = R.append(
+        {x1:1, y1:2, z1:3},
+        {x2:1, y2:2, z2:3}
+    )
+    let expected = {
+        x1:1, y1:2, z1:3, 
+        x2:1, y2:2, z2:3
+    }
+    expect(result).toStrictEqual(expected);
+})
 
 // test("Testing list: as_vector", () => {
 //     let result, expected;
