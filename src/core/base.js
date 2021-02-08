@@ -116,6 +116,26 @@ const seq = typed('seq_by', {
 
 
 /**
+ * Generates an arithmetic sequence of number.
+ * 
+ * @param {Array} along_with An Array, from which the length is taken.
+ * 
+ * @return {Array} A sequence of number from 0 to the last index of the Array.
+ * 
+ * @example
+ * // returns [0, 1, 2]
+ * seq_along(['a', 'b', 'c'])
+ * 
+ * @exports
+ */
+const seq_along = typed('seq_along', {
+    'any' : function(along_with) {
+        return seq(0, length(along_with) - 1, 1);
+    }
+})
+
+
+/**
  * Replicate elements
  * 
  * @param {(number | Array)} x A number or a JavaScript Array; the element to replicate.
@@ -155,4 +175,4 @@ export * from "./base/sets.js"
 export * from "./base/stats.js"
 export * from "./base/utils.js"
 // export * from "./base/extra.js"
-export { length, typeOf as typeof, which, seq, rep }
+export { length, typeOf as typeof, which, seq, seq_along, rep }

@@ -71,6 +71,14 @@ test("Testing base::seq_by", () => {
 })
 
 
+test("Testing base::seq_along", () => {
+    let input, result, expected;
+    result = R.seq_along(['a', 'b', 'c']); 
+    expected = [0, 1, 2];
+    expect(result).toStrictEqual(expected);
+})
+
+
 test("Testing base::rep", () => {
     let input, result, expected;
     result = R.rep(1, 3); 
