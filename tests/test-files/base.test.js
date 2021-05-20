@@ -57,6 +57,10 @@ test("Testing base::seq_by", () => {
     result = () => { R.seq(10, 1, 2) };
     expect(result).toThrow();
 
+    result = R.seq(1, 1); 
+    expected = [1];
+    expect(result).toStrictEqual(expected);
+
     result = R.seq(5, 1); 
     expected = [5, 4, 3, 2, 1];
     expect(result).toStrictEqual(expected);

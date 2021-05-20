@@ -93,6 +93,7 @@ const which = typed('which', {
  */
 const seq = typed('seq_by', {
     'number, number': function(from, to) {
+        if (from == to) return [from];
     	return seq(from, to, Math.sign(to - from));
     },
     'number, number, number': function(from = 1, to = 1, by = 1) {
